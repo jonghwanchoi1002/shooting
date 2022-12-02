@@ -8,11 +8,11 @@ canvas.height = 700;
 document.body.appendChild(canvas);
 
 // 변수 선언
-let backgroundImage, spaceshipImage, bulletImage, enemyImage, gameOverImage, press_s, backgroundStart;
+let backgroundImage, spaceshipImage, bulletImage, enemyImage, gameOverImage, press_s, press_r, backgroundStart;
 
 let gameOver = true; // true이면 게임 오버
 let gameStart = true;
-let gameRestart = true;
+let gameRestart = false;
 
 let score = 0;
 // 우주선 좌표
@@ -78,6 +78,7 @@ function Enemy() {
 
     if (this.y > canvas.height - 48) {
       gameOver = true;
+      gameRestart = true;
       // console.log("game over");
     }
   };
@@ -103,11 +104,11 @@ function loadImage() {
   gameOverImage = new Image();
   gameOverImage.src = "img/game over.jpg";
 
-  startImage = new Image();
-  startImage.src = "img/play button.png";
-
   press_s = new Image();
   press_s.src = "img/press s.png";
+
+  press_r = new Image();
+  press_r.src = "img/press_r.png";
 }
 
 function start(){
@@ -121,12 +122,15 @@ function startPage(){
 }
 
 function restart(){
+  location.reload();
+  gameStart = false;
   gameOver = false;
+  gameRestart = false;
 }
 
-
-function mainButton(){
-  ctx.drawImage(startImage, 200, 200);
+function restartPage(){
+  ctx.drawImage(backgroundStart, 0, 0, 400, 700);
+  ctx.drawImage(press_r, 0, 0, 400, 700);
 }
 
 // 이미지를 렌더링하는(보여주는) 함수
@@ -134,7 +138,6 @@ function render() {
 
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(spaceshipImage, spaceshipX, spaceshipY);
-  ctx.drawImage(startImage, 200, 200);
 
   ctx.fillText(`Score:${score}`, 20, 20);
   ctx.fillStyle = "White";
@@ -165,6 +168,10 @@ function setupKeyboardListener() {
   document.addEventListener("keyup", function (event) {
     delete keysDown[event.key];
     // console.log("버튼 클릭 후", keysDown);
+
+    if (event.key == "e" || event.key == "E") {
+      end();
+    }
 
     if (event.key == "s" || event.key == "S") {
       start();
@@ -240,15 +247,15 @@ function main() {
     startPage();
     requestAnimationFrame(main);
   }
-  if (!gameOver) {
-    mainButton();
+  if (!gameOver & !gameRestart) {
     update(); // 좌표값을 업데이트 하고
     render(); // 그려주고 (렌더링하고)
     // console.log("animation calls main function");
     requestAnimationFrame(main);
   }
   if (gameOver && gameRestart) {
-
+    restartPage();
+    requestAnimationFrame(main);
   }
 }
 
