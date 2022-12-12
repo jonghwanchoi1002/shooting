@@ -1,4 +1,6 @@
-// 캔버스 세팅
+// Version 1.1
+
+// canvas setting
 let canvas;
 let ctx;
 canvas = document.createElement("canvas");
@@ -8,7 +10,7 @@ canvas.height = 700;
 document.body.appendChild(canvas);
 
 // 변수 선언
-let backgroundImage, spaceshipImage, bulletImage, enemyImage, gameOverImage, press_s, press_r, backgroundStart;
+let backgroundImage, spaceshipImage, bulletImage, enemyImage, gameOverImage, explosionImage, press_s, press_r, backgroundStart;
 
 let gameOver = true; // true이면 게임 오버
 let gameStart = true;
@@ -137,7 +139,9 @@ function loadImage() {
   gameOverImage = new Image();
   gameOverImage.src = "img/game over.jpg";
 
-<<<<<<< Updated upstream
+  explosionImage = new Image();
+  explosionImage.src = "img/explosion.png"
+
   press_s = new Image();
   press_s.src = "img/press s.png";
 
@@ -164,25 +168,16 @@ function restart(){
 
 function restartPage(){
   ctx.drawImage(backgroundStart, 0, 0, 400, 700);
+  ctx.drawImage(gameOverImage, 0, canvas.height / 8, 400, 300);
   ctx.drawImage(press_r, 0, 0, 400, 700);
-=======
-  explosionImage = new Image();
-  explosionImage.src = "img/explosion.png";
->>>>>>> Stashed changes
 }
 
 // 이미지를 렌더링하는(보여주는) 함수
 function render() {
 
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-<<<<<<< Updated upstream
-  ctx.drawImage(spaceshipImage, spaceshipX, spaceshipY);
-
-=======
   ctx.drawImage(spaceshipImage, spaceship.x, spaceship.y);
-  
-  // rendering score text
->>>>>>> Stashed changes
+
   ctx.fillText(`Score:${score}`, 20, 20);
   ctx.fillStyle = "White";
   ctx.font = "20px Arial";
@@ -214,7 +209,6 @@ function setupKeyboardListener() {
 
   document.addEventListener("keyup", function (event) {
     delete keysDown[event.key];
-<<<<<<< Updated upstream
     // console.log("버튼 클릭 후", keysDown);
 
     if (event.key == "e" || event.key == "E") {
@@ -229,8 +223,6 @@ function setupKeyboardListener() {
       restart();
     }
 
-=======
->>>>>>> Stashed changes
     if (event.key == " ") {
       createBullet(); // 총알 생성
     }
@@ -298,6 +290,7 @@ function update() {
       spaceship.x + 30 >= enemyList[i].x
     ) {
       gameOver = true;
+      gameRestart = true;
     }
   }
 }
@@ -307,10 +300,9 @@ function main() {
     startPage();
     requestAnimationFrame(main);
   }
-  if (!gameOver & !gameRestart) {
+  if (!gameOver && !gameRestart) {
     update(); // 좌표값을 업데이트 하고
     render(); // 그려주고 (렌더링하고)
-    // console.log("animation calls main function");
     requestAnimationFrame(main);
   }
   if (gameOver && gameRestart) {
