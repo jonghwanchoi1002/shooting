@@ -1,5 +1,10 @@
 // Version 1.1
 
+// var bgm;
+
+// bgm = new sound('sound/battleThemeA.mp3');
+// bgm.play();
+
 // canvas setting
 let canvas;
 let ctx;
@@ -59,7 +64,10 @@ function Bullet() {
   this.init = function () {
     this.x = spaceship.x + 12;
     this.y = spaceship.y;
-
+    this.sound = new Audio();
+    this.sound.src = 'sound/firing.mp3';
+    this.sound.volume = 0.1;
+    this.sound.play();
     this.alive = true; // true면 살아있는 총알, false면 사라지는 총알
 
     bulletList.push(this);
@@ -130,6 +138,9 @@ class Explosion {
     this.x = x;
     this.y = y;
     this.opacity = 1;
+    this.sound = new Audio();
+    this.sound.src = 'sound/explosion.wav';
+    this.sound.volume = 0.1;
   }
   
   draw() {
@@ -138,8 +149,9 @@ class Explosion {
     ctx.drawImage(explosionImage, this.x, this.y);
     ctx.restore();
   }
-  updateExplosion() {
+  update() {
     this.draw();
+    this.sound.play();
     this.opacity -= 0.2
   }
 }
@@ -326,13 +338,39 @@ function update() {
       explosionList.splice(i, 1);
     }
     else {
-      explosionList[i].updateExplosion();
+      explosionList[i].update();
     }
     
   }
   console.log('explosionList', explosionList);
 
   
+}
+
+// Sound Effect
+function sound(src) {
+  this.sound = document.createAttribute("audio");
+  this.sound.src = src;
+  document.body.appendChild(this.sound);
+  this.play = function() {
+    this.sound.play();
+  }
+  this.stop = function() {
+    this.sound.stop();
+  }
+}
+
+// Background music
+let bgm;
+function startBgm() {
+  this.sound = new Audio();
+  this.sound.src = 'sound/battleThemeA.mp3';
+  this.sound.volume = 0.2;
+  this.addEventListener('ended', function(){
+    this.currentTime = 0;
+    this.play();
+  }, false);
+  this.sound.play();
 }
 
 function main() {
@@ -351,6 +389,7 @@ function main() {
   }
 }
 
+startBgm();
 loadImage();
 setupKeyboardListener();
 createEnemy();
