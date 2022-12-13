@@ -364,15 +364,13 @@ function sound(src) {
 let bgm;
 function startBgm() {
   this.sound = new Audio();
-  this.sound.src = 'sound/battleThemeA.mp3';
-  this.sound.volume = 0.2;
-  this.addEventListener('ended', function(){
-    this.currentTime = 0;
-    this.play();
-  }, false);
+  this.sound.src = 'sound/Star_Wars_Main_Theme_Song.mp3';
+  this.sound.volume = 0.4;
+  this.sound.loop = true;
   this.sound.play();
 }
 
+// main function for game start
 function main() {
   if (gameOver && gameStart) {
     startPage();
