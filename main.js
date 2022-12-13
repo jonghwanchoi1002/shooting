@@ -50,6 +50,7 @@ class Spaceship {
 
 // creating a spaceship
 let spaceship = new Spaceship("X-Wing");
+let enemyList = []; // 적군 리스트
 
 // 총알 클래스 생성 (function 이용)
 function Bullet() {
@@ -67,17 +68,20 @@ function Bullet() {
     this.y -= 5;
   };
 
-  this.checkHit = function () {
+  this.enemyHit = function () {
     for (let i = 0; i < enemyList.length; i++) {
       if (
         this.y <= enemyList[i].y &&
         this.x >= enemyList[i].x &&
         this.x <= enemyList[i].x + 48
       ) {
+        explosionList.push(new Explosion(enemyList[i].x, enemyList[i].y));
+        
         // 총알과 적군의 우주선이 없어짐, 점수 획득
         score++;
         this.alive = false;
         enemyList.splice(i, 1);
+        
       }
     }
   };
@@ -96,7 +100,6 @@ function generateRandomValue(min, max) {
   return randomNum;
 }
 
-let enemyList = []; // 적군 리스트
 
 // 적군 클래스 생성
 function Enemy() {
@@ -117,6 +120,28 @@ function Enemy() {
       // console.log("game over");
     }
   };
+}
+
+// enemy explosion
+let explosionList = [];
+
+class Explosion {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.opacity = 1;
+  }
+  
+  draw() {
+    ctx.save();      
+    ctx.globalAlpha = this.opacity;
+    ctx.drawImage(explosionImage, this.x, this.y);
+    ctx.restore();
+  }
+  updateExplosion() {
+    this.draw();
+    this.opacity -= 0.2
+  }
 }
 
 // 이미지를 가져오는 함수
@@ -186,16 +211,18 @@ function render() {
   for (let i = 0; i < bulletList.length; i++) {
     if (bulletList[i].alive) {
       ctx.drawImage(bulletImage, bulletList[i].x, bulletList[i].y);
-    }
-    if (!bulletList[i].alive) {
-      ctx.drawImage(explosionImage, bulletList[i].x, bulletList[i].y);
-      // ctx.clearRect(bulletList[i].x, bulletList[i].y, 48, 48);
-      
-    }
+    }  
   }
   // rendering enemies
   for (let i = 0; i < enemyList.length; i++) {
     ctx.drawImage(enemyImage, enemyList[i].x, enemyList[i].y);
+    // ctx.globalAlpha = 0;
+  }
+
+  // rendering explosion effect
+
+  for (let i = 0; i < explosionList.length; i++) {
+    ctx.drawImage(explosionImage, explosionList[i].x, explosionList[i].y);  
   }
 }
 
@@ -273,7 +300,7 @@ function update() {
   for (let i = 0; i < bulletList.length; i++) {
     if (bulletList[i].alive) {
       bulletList[i].update();
-      bulletList[i].checkHit();
+      bulletList[i].enemyHit();
       bulletList[i].reachedUpperScreen();
     }
   }
@@ -293,6 +320,19 @@ function update() {
       gameRestart = true;
     }
   }
+
+  for (let i = 0; i < explosionList.length; i++) {
+    if (explosionList[i].opacity <= 0) {
+      explosionList.splice(i, 1);
+    }
+    else {
+      explosionList[i].updateExplosion();
+    }
+    
+  }
+  console.log('explosionList', explosionList);
+
+  
 }
 
 function main() {
@@ -315,6 +355,8 @@ loadImage();
 setupKeyboardListener();
 createEnemy();
 main();
+
+
 
 // 방향키를 누르면
 // 우주선의 x, y 좌표가 바뀌며
