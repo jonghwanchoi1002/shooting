@@ -14,11 +14,12 @@ canvas.width = 400;
 canvas.height = 700;
 document.body.appendChild(canvas);
 
-// 변수 선언
-let backgroundImage, spaceshipImage, bulletImage, enemyImage, gameOverImage, explosionImage, press_s, press_r, backgroundStart;
 
-let gameOver = true; // true이면 게임 오버
-let gameStart = true;
+// Variables declaration
+let backgroundImage, spaceshipImage, bulletImage, enemyBulletImage, enemyImage, gameOverImage, explosionImage, press_s, press_r, backgroundStart;
+
+let gameOver = true;
+let gameStart = false; 
 let gameRestart = false;
 
 let score = 0;
@@ -93,7 +94,6 @@ function Bullet() {
       }
     }
   };
-
   this.reachedUpperScreen = function () {
     for (let i = 0; i < bulletList.length; i++) {
       if (bulletList[i].y <= 0) {
@@ -103,6 +103,25 @@ function Bullet() {
   };
 }
 
+let enemyBulletList =[];
+class EnemyBullet {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.sound = new Audio();
+    this.sound.src = 'sound/alienshoot1.wav';
+    this.sound.volume = 0.2;
+    this.sound.play();
+    this.alive = true;
+  }
+  draw() {
+    ctx.drawImage(enemyBulletImage, this.x, this.y, enemyBulletImage.width / 5, enemyBulletImage.height / 5);
+  }
+  update() {
+    this.draw();
+    this.y += 3;
+  }
+}
 function generateRandomValue(min, max) {
   let randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
   return randomNum;
@@ -110,17 +129,14 @@ function generateRandomValue(min, max) {
 
 
 // 적군 클래스 생성
-function Enemy() {
-  this.x = 0;
-  this.y = 0;
-  this.init = function () {
+class Enemy {
+  constructor() {
     this.y = 0;
     this.x = generateRandomValue(0, canvas.width - 48);
+  }
 
-    enemyList.push(this);
-  };
-  this.update = function () {
-    this.y += 2;
+  update() {
+    this.y += 1;
 
     if (this.y > canvas.height - 48) {
       gameOver = true;
@@ -128,11 +144,14 @@ function Enemy() {
       // console.log("game over");
     }
   };
+
+  shoot(enemyBulletList) {
+    enemyBulletList.push(new EnemyBullet(this.x + 10, this.y + enemyImage.height));
+  }
 }
 
 // enemy explosion
 let explosionList = [];
-
 class Explosion {
   constructor(x, y) {
     this.x = x;
@@ -142,7 +161,6 @@ class Explosion {
     this.sound.src = 'sound/explosion.wav';
     this.sound.volume = 0.1;
   }
-  
   draw() {
     ctx.save();      
     ctx.globalAlpha = this.opacity;
@@ -152,14 +170,14 @@ class Explosion {
   update() {
     this.draw();
     this.sound.play();
-    this.opacity -= 0.2
+    this.opacity -= 0.1;
   }
 }
 
 // 이미지를 가져오는 함수
 function loadImage() {
   backgroundStart = new Image();
-  backgroundStart.src = "img/startpage.png"
+  backgroundStart.src = "img/startpage.png";
 
   backgroundImage = new Image();
   backgroundImage.src = "img/background.png";
@@ -168,10 +186,13 @@ function loadImage() {
   spaceshipImage.src = "img/X-Wing Starfighter.png";
 
   bulletImage = new Image();
-  bulletImage.src = "img/bullet.png";
+  bulletImage.src = "img/laser blue.png";
+
+  enemyBulletImage = new Image();
+  enemyBulletImage.src = "img/laser red.png";
 
   enemyImage = new Image();
-  enemyImage.src = "img/Star Trek Enterprise NCC 1701 E.png";
+  enemyImage.src = "img/Star Trek.png";
 
   gameOverImage = new Image();
   gameOverImage.src = "img/game over.jpg";
@@ -188,7 +209,8 @@ function loadImage() {
 
 function start(){
   gameOver = false;
-  gameStart = false;
+  gameStart = true;
+  gameRestart = false;
 }
 
 function startPage(){
@@ -198,9 +220,9 @@ function startPage(){
 
 function restart(){
   location.reload();
-  gameStart = false;
+  gameStart = true;
   gameOver = false;
-  gameRestart = false;
+  gameRestart = true;
 }
 
 function restartPage(){
@@ -209,10 +231,27 @@ function restartPage(){
   ctx.drawImage(press_r, 0, 0, 400, 700);
 }
 
-// 이미지를 렌더링하는(보여주는) 함수
+// Scrolling background image
+let imgHeight = 0;
+let scrollSpeed = 5;
+function scrollingBackgroundImage() {
+  // Draw image 1
+  ctx.drawImage(backgroundImage, 0, imgHeight, canvas.width, canvas.height);
+  // Draw image 2
+  ctx.drawImage(backgroundImage, 0, imgHeight - canvas.height, canvas.width, canvas.height);
+
+  imgHeight += scrollSpeed;
+
+  if (imgHeight == canvas.height) {
+    imgHeight = 0;
+  }
+}
+
+// Rendering images
 function render() {
 
-  ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+  scrollingBackgroundImage();
+  // ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(spaceshipImage, spaceship.x, spaceship.y);
 
   ctx.fillText(`Score:${score}`, 20, 20);
@@ -222,19 +261,28 @@ function render() {
   // rendering bullets
   for (let i = 0; i < bulletList.length; i++) {
     if (bulletList[i].alive) {
-      ctx.drawImage(bulletImage, bulletList[i].x, bulletList[i].y);
+      // ctx.save();
+      // ctx.translate(bulletList[i].x, bulletList[i].y);
+      // ctx.rotate(-90 * Math.PI / 180);
+      // ctx.translate(-bulletList[i].x, -bulletList[i].y)
+      // ctx.drawImage(bulletImage, bulletList[i].x, bulletList[i].y, bulletImage.width/5, bulletImage.height/5);
+      // ctx.restore();
+      ctx.drawImage(bulletImage, bulletList[i].x, bulletList[i].y, bulletImage.width/5, bulletImage.height/5);
     }  
   }
   // rendering enemies
   for (let i = 0; i < enemyList.length; i++) {
     ctx.drawImage(enemyImage, enemyList[i].x, enemyList[i].y);
-    // ctx.globalAlpha = 0;
   }
 
   // rendering explosion effect
 
   for (let i = 0; i < explosionList.length; i++) {
     ctx.drawImage(explosionImage, explosionList[i].x, explosionList[i].y);  
+  }
+
+  for (let i = 0; i < enemyBulletList.length; i++) {
+    ctx.drawImage(enemyBulletImage, enemyBulletList[i].x, enemyBulletList[i].y, enemyBulletImage.width / 5, enemyBulletImage.height / 5);
   }
 }
 
@@ -263,22 +311,32 @@ function setupKeyboardListener() {
     }
 
     if (event.key == " ") {
-      createBullet(); // 총알 생성
+      createBullet();    }
+
+    if (event.key == "m") {
+      let m = new startBgm();
+      startBgm.muteBgm();
     }
   });
 }
 
+// Creating bullets
 function createBullet() {
-  let b = new Bullet(); // 총알 하나 생성
+  let b = new Bullet();
   b.init();
 }
 
-function createEnemy() {
-  const interval = setInterval(function () {
-    let e = new Enemy();
-    e.init();
-  }, 500);
-}
+// Creating enemies
+// function createEnemy() {
+//   const interval = setInterval(function () {
+//     let e = new Enemy();
+//     e.init();
+//   }, 500);
+// }
+
+// Increasing the number of frame for each update
+let frames = 0;
+let randomInterval = Math.floor(Math.random() * 100);
 
 function update() {
   if ("ArrowRight" in keysDown) {
@@ -294,7 +352,8 @@ function update() {
     spaceship.setSpaceshipY(spaceship.y + 5);
   }
 
-  // 우주선 좌표값 최소 최대값 설정 (안 그러면 화면 밖으로 벗어남)
+  // Setting min max coordinates of spaceship
+  // Spaceship should be inside the canvas
   if (spaceship.x <= 0) {
     spaceship.setSpaceshipX(0);
   }
@@ -308,7 +367,7 @@ function update() {
     spaceship.setSpaceshipY(canvas.height - 48);
   }
 
-  // 총알의 y좌표 업데이트하는 함수 호출
+  // Updating bullets coordinates
   for (let i = 0; i < bulletList.length; i++) {
     if (bulletList[i].alive) {
       bulletList[i].update();
@@ -319,15 +378,22 @@ function update() {
 
   for (let i = 0; i < enemyList.length; i++) {
     enemyList[i].update();
+
+    // Spawn enemy bullets
+    if (frames % 100 == 0 && enemyList.length > 0) {
+      enemyList[Math.floor(Math.random() * enemyList.length)].shoot(enemyBulletList);
+    }
+  
   }
 
   for (let i = 0; i < enemyList.length; i++) {
     if (
-      spaceship.y <= enemyList[i].y + 30 &&
-      spaceship.y + 40 >= enemyList[i].y &&
+      spaceship.y <= enemyList[i].y + 35 &&
+      spaceship.y + 35 >= enemyList[i].y &&
       spaceship.x <= enemyList[i].x + 30 &&
-      spaceship.x + 30 >= enemyList[i].x
+      spaceship.x + 35 >= enemyList[i].x
     ) {
+      explosionList.push(new Explosion(enemyList[i].x, enemyList[i].y));
       gameOver = true;
       gameRestart = true;
     }
@@ -342,12 +408,36 @@ function update() {
     }
     
   }
-  console.log('explosionList', explosionList);
-
   
+  for (let i = 0; i < enemyBulletList.length; i++) {
+    enemyBulletList[i].update(); 
+  }
+
+  for (let i = 0; i < enemyBulletList.length; i++) {
+    if (
+      spaceship.y <= enemyBulletList[i].y + 30 &&
+      spaceship.y + 40 >= enemyBulletList[i].y &&
+      spaceship.x <= enemyBulletList[i].x + 15 &&
+      spaceship.x + 32 >= enemyBulletList[i].x
+    ) {
+      explosionList.push(new Explosion(spaceship.x, spaceship.y));
+      gameOver = true;
+      gameRestart = true;
+    } 
+  }
+
+  // Spawning enemies
+  if (frames % randomInterval == 0) { // Set interval of enemy spawn
+    let e = new Enemy();
+    enemyList.push(e);
+    randomInterval = Math.floor(Math.random() * 100);
+  }
+  frames++; // increasing frame
+  // console.log(frames) 
 }
 
 // Sound Effect
+/*
 function sound(src) {
   this.sound = document.createAttribute("audio");
   this.sound.src = src;
@@ -359,24 +449,29 @@ function sound(src) {
     this.sound.stop();
   }
 }
+*/
 
 // Background music
-let bgm;
 function startBgm() {
   this.sound = new Audio();
   this.sound.src = 'sound/Star_Wars_Main_Theme_Song.mp3';
+  // this.sound.src = 'sound/battleThemeA.mp3';
   this.sound.volume = 0.4;
-  this.sound.loop = true;
+  this.sound.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+  }, false);
+  // this.sound.loop = true;
   this.sound.play();
 }
 
 // main function for game start
 function main() {
-  if (gameOver && gameStart) {
+  if (gameOver && !gameStart && !gameRestart) {
     startPage();
     requestAnimationFrame(main);
   }
-  if (!gameOver && !gameRestart) {
+  if (!gameOver && gameStart && !gameRestart) {
     update(); // 좌표값을 업데이트 하고
     render(); // 그려주고 (렌더링하고)
     requestAnimationFrame(main);
@@ -390,7 +485,7 @@ function main() {
 startBgm();
 loadImage();
 setupKeyboardListener();
-createEnemy();
+// createEnemy();
 main();
 
 

@@ -1,20 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flight shooting</title>
+    <link rel="stylesheet" href="main.css">
     <style>
-        body {
-            background-image: url('img/background(html).jpg');
-            background-repeat: no-repeat;
-            background-size: cover;
-        }
+      body {
+        background-image: url("img/background(html).jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
     </style>
-</head>
-<!-- <embed src="sound/battleThemeA.mp3" autostart="true" loop="true"> -->
-<body>
+  </head>
+  <body>
     <script src="main.js"></script>
-</body>
+
+    <button id="mute">mute</button>
+    <script>
+      document.getElementById("mute").addEventListener("click", function (evt) {
+        if (snd.muted) {
+          snd.muted = false;
+          evt.target.innerHTML = "mute";
+        } else {
+          snd.muted = true;
+          evt.target.innerHTML = "unmute";
+        }
+      });
+    </script>
+
+    <div class="scoreboard">
+      <div class="scoreboard__name">Player One</div>
+      <div class="scoreboard__name">Player Two</div>
+      <div class="scoreboard__score">0</div>
+      <div class="scoreboard__score">0</div>
+    </div>
+  </body>
 </html>
