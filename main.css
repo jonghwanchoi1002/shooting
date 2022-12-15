@@ -1,18 +1,1 @@
-.scoreboard {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 300px;
-    font-family: sans-serif;
-}
-
-.scoreboard__name,
-.scoreboard__score {
-    padding: 10px;
-    text-align: center;
-
-}
-
-.scoreboard__name {
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-}
+body {overflow: hidden;}

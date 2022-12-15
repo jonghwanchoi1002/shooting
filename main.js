@@ -63,7 +63,7 @@ function Bullet() {
   this.x = 0;
   this.y = 0;
   this.init = function () {
-    this.x = spaceship.x + 12;
+    this.x = spaceship.x + 10;
     this.y = spaceship.y;
     this.sound = new Audio();
     this.sound.src = 'sound/firing.mp3';
@@ -80,9 +80,9 @@ function Bullet() {
   this.enemyHit = function () {
     for (let i = 0; i < enemyList.length; i++) {
       if (
-        this.y <= enemyList[i].y &&
-        this.x >= enemyList[i].x &&
-        this.x <= enemyList[i].x + 48
+        this.y <= enemyList[i].y + 10 &&
+        this.x >= enemyList[i].x - 8 &&
+        this.x <= enemyList[i].x + 36
       ) {
         explosionList.push(new Explosion(enemyList[i].x, enemyList[i].y));
         
@@ -311,11 +311,7 @@ function setupKeyboardListener() {
     }
 
     if (event.key == " ") {
-      createBullet();    }
-
-    if (event.key == "m") {
-      let m = new startBgm();
-      startBgm.muteBgm();
+      createBullet();    
     }
   });
 }
@@ -336,7 +332,7 @@ function createBullet() {
 
 // Increasing the number of frame for each update
 let frames = 0;
-let randomInterval = Math.floor(Math.random() * 100);
+let randomInterval = Math.floor(Math.random() * 200);
 
 function update() {
   if ("ArrowRight" in keysDown) {
@@ -430,7 +426,7 @@ function update() {
   if (frames % randomInterval == 0) { // Set interval of enemy spawn
     let e = new Enemy();
     enemyList.push(e);
-    randomInterval = Math.floor(Math.random() * 100);
+    randomInterval = Math.floor(Math.random() * 200);
   }
   frames++; // increasing frame
   // console.log(frames) 

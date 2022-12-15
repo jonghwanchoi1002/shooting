@@ -1,4 +1,6 @@
-# Game Title
+# X-Wing
+
+https://flightshooting.netlify.app/
 
 ## To DO (Improvement)
 Start screen - the game starts after pressing a key
