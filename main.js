@@ -428,6 +428,7 @@ function update() {
     enemyList.push(e);
     randomInterval = Math.floor(Math.random() * 200);
   }
+
   frames++; // increasing frame
   // console.log(frames) 
 }
@@ -448,18 +449,29 @@ function sound(src) {
 */
 
 // Background music
-function startBgm() {
-  this.sound = new Audio();
-  this.sound.src = 'sound/Star_Wars_Main_Theme_Song.mp3';
-  // this.sound.src = 'sound/battleThemeA.mp3';
-  this.sound.volume = 0.4;
-  this.sound.addEventListener('ended', function() {
-    this.currentTime = 0;
-    this.play();
-  }, false);
-  // this.sound.loop = true;
-  this.sound.play();
-}
+// function startBgm() {
+//   this.sound = new Audio();
+//   this.sound.src = 'sound/Star_Wars_Main_Theme_Song.mp3';
+//   // this.sound.src = 'sound/battleThemeA.mp3';
+//   this.sound.volume = 0.4;
+//   this.sound.addEventListener('ended', function() {
+//     this.currentTime = 0;
+//     this.play();
+//   }, false);
+//   // this.sound.loop = true;
+//   this.sound.play();
+
+//   document.getElementById('mute').addEventListener('click', function(evt) {
+//     if (this.sound.muted) {
+//       this.sound.muted = false;
+//       evt.target.innerHTML = 'mute';
+//     }
+//     else {
+//       this.sound = true;
+//       evt.target.innerHTML = 'unmute'
+//     }
+//   })
+// }
 
 // main function for game start
 function main() {
@@ -478,7 +490,7 @@ function main() {
   }
 }
 
-startBgm();
+// startBgm();
 loadImage();
 setupKeyboardListener();
 // createEnemy();

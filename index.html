@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flight shooting</title>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="main.css" />
     <style>
       body {
         background-image: url("img/background(html).jpg");
@@ -15,7 +15,23 @@
     </style>
   </head>
   <body>
-    <script src="main.js"></script>   
+    <button id="mute">mute</button>
 
+    <script>
+      var bgm = new Audio("sound/Star_Wars_Main_Theme_Song.mp3");
+      bgm.play();
+
+      document.getElementById("mute").addEventListener("click", function (evt) {
+        if (bgm.muted) {
+          bgm.muted = false;
+          evt.target.innerHTML = "mute";
+        } else {
+          bgm.muted = true;
+          evt.target.innerHTML = "unmute";
+        }
+      });
+    </script>
+
+    <script src="main.js"></script>
   </body>
 </html>
